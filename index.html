@@ -4,26 +4,39 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>To-do List</title>
+    <link rel="stylesheet" href="style.css">
 </head>
-<body>
-    <h1>Todo List</h1>    
+<body>  
     <main>
+        <h1>Todo List</h1>  
         <section class="list-cont">
             <div class="list default">
-                <h3 class="name">Default</h3>
+                <div class="name">
+                    <div class="icon"></div>
+                    <h3>Default</h3>
+                </div>
                 <p class="amount"></p>
             </div>
             <div class="list today">
-                <h3 class="name">Today</h3>
+                <div class="name">
+                    <div class="icon"></div>
+                    <h3>Today</h3>
+                </div>
                 <p class="amount"></p>
             </div>
             <div class="list important">
-                <h3 class="name">mportant</h3>
+                <div class="name">
+                    <div class="icon"></div>
+                    <h3>Important</h3>
+                </div>                
                 <p class="amount"></p>
             </div>
             <hr>
         </section>
-        <button class="add-list-btn">+ New List</button>
+        <div class="new-list">
+            <div class="plus-icon">+</div>
+            <p>New List</p>
+        </div>
     </main>
 </body>
 </html>
