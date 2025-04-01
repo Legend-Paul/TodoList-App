@@ -7,12 +7,32 @@
     --background-color: #0A192F;
     --text-color: #E0E0E0;
     --orange: #FF9F1C;
+    --red: #E63946;
+    --blue: #1E90FF;
+    --green: #2ECC71;
+    --light-grey: #B0B3B8;
+    --white: #fff;
 }
 
 body {
     background-color: var(--background-color);
     color: var(--text-color);
+    
 }
+
+input {
+    outline:  none;
+    border-radius: .25rem;
+    border: 1px solid var(--light-grey);
+    &:user-valid, &:valid {
+        border: 1px solid var(--green);
+    }
+    &:user-invalid, &:invalid{
+        border: 1px solid var(--red);
+    }
+    &:focus:valid, &:focus:invalid{
+    border: 1px solid var(--blue);
+}}
 
 main {
     padding-top: 2rem;
@@ -23,15 +43,16 @@ main {
         margin-top: 1rem;
         display: flex;
         flex-direction: column;
-        gap: 1.5rem;
+        gap: 1rem;
         .list {
             margin-left: 5rem;
-            /* border-bottom: 1px solid grey; */
             cursor: pointer;
             padding-bottom: .5rem;
+            box-shadow: 1px 1px 1px rgba(0, 0, 0.2);
+            padding: 1rem;
             .name {
                 display: flex;
-                gap: 1rem;
+                gap: 1.5rem;
                 .icon {
                     width: 1.5rem;
                     height: 1.5rem;
@@ -45,7 +66,7 @@ main {
         }
         
     }
-    .new-list {
+    .new-list-btn {
         display: flex;
         gap: 1rem;
         font-size: 1.25rem;
@@ -53,5 +74,39 @@ main {
         position: fixed;
         bottom: 5%;
         color: var(--text-color);
+    }
+}
+
+dialog {
+    place-self: center;
+}
+.new-list-dialog {
+    padding: 1rem 1rem;
+    label {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+        input {
+            width: 20rem;
+            height: 2rem;
+            padding: .5rem;
+        }
+    }
+    .btn-cont {
+        display: flex;
+        justify-content: space-between;
+        button {
+            padding: 0 1rem;
+            height: 1.8rem;
+            border: none;
+            background-color: var(--green);
+            border-radius: .25rem;
+            color: var(--white, white);
+            cursor: pointer;
+        }
+        .cancel {
+            background-color: var(--red);
+        }
     }
 }
