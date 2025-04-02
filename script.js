@@ -10,6 +10,8 @@ let editList = document.querySelector(".bi-pencil");
 let listName = document.querySelector(".list-name");
 let listAmount = document.querySelector(".amount");
 
+let currentListName = '';
+let defaultList = true;
 function openDialog() {
     newListDialog.showModal();
     listTitle.value = "";
@@ -177,22 +179,26 @@ class List {
 class Task {
     getClickedList() {
         document.addEventListener("click", (e) => {
-            const clickedList = e.target.closest(".list"); 
+            let clickedList = e.target.closest(".list"); 
             console.log(clickedList);
             if (clickedList) {
                 let listId = clickedList.dataset.listId; 
                 let listName = clickedList.querySelector(".list-name").textContent; 
+                currentListName = listName;
                 if (listId > 2){
                     listCont.innerHTML = this.openCreatedTaskPage(listName);
+                    defaultList = false;
                 }                
                 else {
                     listCont.innerHTML = this.openDefaultTaskPage(listName);
+                    defaultList = true;
                 }
                 this.createNewTaskBtn();
                 this.openTaskPage();
             }
         });
     }
+   
     createNewTaskBtn(){
         newListBtnText.innerHTML = "New Task";
         newListBtn.removeEventListener("click", openDialog);
@@ -237,7 +243,7 @@ class TodoList{
     }
     moveToHomeSection () {
         document.addEventListener("click", (e)=>{
-            const clickedList = e.target.closest(".back-home-btn");
+            let clickedList = e.target.closest(".back-home-btn");
             console.log(clickedList);
             if (clickedList) {
                 this.list.getStorageList();
@@ -245,15 +251,31 @@ class TodoList{
                 newListBtn.removeEventListener("click", getTaskPageContent);
                 newListBtnText.innerHTML = "New List";
             }
-        });
-        
+        });  
     }
+
+    moveToTaskSection(){
+        document.addEventListener("click", (e)=>{
+            let clickedList = e.target.closest(".back-task-btn");
+            console.log(clickedList);
+            if (clickedList) {
+                if (!defaultList){
+                    listCont.innerHTML = this.task.openCreatedTaskPage(currentListName);
+                }                
+                else {
+                    listCont.innerHTML = this.task.openDefaultTaskPage(currentListName);
+                }
+            }
+        }); 
+    }
+
     showList() {
         this.list.showList();
         this.task.showTask();
         this.moveToHomeSection();
+        this.moveToTaskSection();
     }
 }
 
-const todoList = new TodoList();
+let todoList = new TodoList();
 todoList.showList();
