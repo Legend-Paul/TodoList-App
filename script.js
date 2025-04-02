@@ -12,8 +12,43 @@ let listAmount = document.querySelector(".amount");
 
 function openDialog() {
     newListDialog.showModal();
-    newListBtnText.innerHTML = "New List";
     listTitle.value = "";
+}
+function getTaskPageContent(){
+    return listCont.innerHTML = `
+        <div class="task-header">
+            <div class="left-content">
+                <i class="bi bi-arrow-left back-task-btn"></i>
+            </div>
+            <div class="right-content">
+                <i class="bi bi-trash3"></i>
+                <p class="icon-name">Delete_Task</p>
+            </div>
+        </div>  
+        <div class="description-cont">
+            <label>
+                Task Description:
+                <input type="text" class="description" placeholder="e.g Read book 20 minutes per day">
+            </label>
+            <label>
+                Due Date:
+                <input type="date" class="date">
+            </label>
+            <label>
+                Time:
+                <input type="time" class="time">
+            </label>
+            <div class="repeate-options-cont">
+                <p>Select Repeate Options</p>
+                <select name="repeate-options" class="repeate-options">
+                    <option value="no-repeate">No Repeate</option>
+                    <option value="everyday">Everyday</option>
+                    <option value="per-week">Per Week</option>
+                    <option value="per-month">Per Month</option>
+                </select>
+            </div>
+        </div>     
+    `;
 }
 
 class List {
@@ -141,8 +176,9 @@ class List {
 
 class Task {
     getClickedList() {
-        listCont.addEventListener("click", (e) => {
+        document.addEventListener("click", (e) => {
             const clickedList = e.target.closest(".list"); 
+            console.log(clickedList);
             if (clickedList) {
                 let listId = clickedList.dataset.listId; 
                 let listName = clickedList.querySelector(".list-name").textContent; 
@@ -152,11 +188,12 @@ class Task {
                 else {
                     listCont.innerHTML = this.openDefaultTaskPage(listName);
                 }
-                this.changeAddBtn();
+                this.createNewTaskBtn();
+                this.openTaskPage();
             }
         });
     }
-    changeAddBtn(){
+    createNewTaskBtn(){
         newListBtnText.innerHTML = "New Task";
         newListBtn.removeEventListener("click", openDialog);
     }
@@ -164,7 +201,7 @@ class Task {
         return `
             <div class="task-header">
                 <div class="left-content">
-                    <i class="bi bi-arrow-left"></i>
+                    <i class="bi bi-arrow-left back-home-btn"></i>
                     <h2>${listName}</h2>
                 </div>
             </div>
@@ -174,7 +211,7 @@ class Task {
         return `
             <div class="task-header">
                 <div class="left-content">
-                    <i class="bi bi-arrow-left"></i>
+                    <i class="bi bi-arrow-left back-home-btn"></i>
                     <h1>${listName}</h1>
                 </div>
                 <div class="right-content">
@@ -184,7 +221,10 @@ class Task {
             </div>
         `;
     }
-
+    
+    openTaskPage(){
+        newListBtn.addEventListener("click", getTaskPageContent);
+    }
     showTask() {
         this.getClickedList(); 
     }
@@ -195,13 +235,15 @@ class TodoList{
         this.list = new List();
         this.task = new Task();
     }
-    moveToDefaultSection () {
+    moveToHomeSection () {
         document.addEventListener("click", (e)=>{
-            const clickedList = e.target.closest(".bi-arrow-left");
+            const clickedList = e.target.closest(".back-home-btn");
             console.log(clickedList);
             if (clickedList) {
                 this.list.getStorageList();
                 this.list.openTodoDialog();
+                newListBtn.removeEventListener("click", getTaskPageContent);
+                newListBtnText.innerHTML = "New List";
             }
         });
         
@@ -209,9 +251,9 @@ class TodoList{
     showList() {
         this.list.showList();
         this.task.showTask();
-        this.moveToDefaultSection();
+        this.moveToHomeSection();
     }
 }
 
 const todoList = new TodoList();
-// todoList.showList();
+todoList.showList();
