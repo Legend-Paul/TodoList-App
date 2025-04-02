@@ -4,37 +4,66 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>To-do List</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+
     <link rel="stylesheet" href="style.css">
 </head>
 <body>  
     <main>
-        <h1>Todo List</h1>  
-        <section class="list-cont">
-            <div class="list default">
-                <div class="name">
-                    <div class="icon"></div>
-                    <h3>Default</h3>
+        <section class="list-cont">   
+            <div class="task-header">
+                <div class="left-content">
+                    <i class="bi bi-arrow-left"></i>
+                    <p class="icon-name">Back</p>
                 </div>
-                <p class="amount"></p>
-            </div>
-            <div class="list today">
-                <div class="name">
-                    <div class="icon"></div>
-                    <h3>Today</h3>
+                <div class="right-content">
+                    <i class="bi bi-trash3"></i>
+                    <p class="icon-name">Delete_Task</p>
                 </div>
-                <p class="amount"></p>
-            </div>
-            <div class="list important">
-                <div class="name">
-                    <div class="icon"></div>
-                    <h3>Important</h3>
+            </div>  
+            <div class="description-cont">
+                <label>
+                    Task Description:
+                    <input type="text" placeholder="e.g Read book 20 minutes per day">
+                </label>
+                <label>
+                    Due Date:
+                    <input type="date">
+                </label>
+                <label>
+                    Time:
+                    <input type="time">
+                </label>
+                <div class="repeate-options-cont">
+                    <p>Select Repeate Options</p>
+                    <select name="repeate-options" id="">
+                        <option value="no-repeate">No Repeate</option>
+                        <option value=everyday"">Everyday</option>
+                        <option value="once-per-week">Once per Week</option>
+                        <option value="once-per-month">Once per Month</option>
+                    </select>
+                </div>
+            </div>      
+            <!--
+            <div class="task-cont">
+                <div class="task">
+                    <div class="left-content">
+                        <input type="checkbox" class="checkbox">
+                        <div class="descripton-cont">
+                            <h4 class="decription">Reading</h4>
+                            <p>Time</p>
+                        </div>
+                    </div>
+                    <div class="right-content">
+                        <i class="bi bi-star-fill"></i>
+                    </div>                
                 </div>                
-                <p class="amount"></p>
-            </div>
-            <hr>
+            </div> -->
         </section>
         <div class="new-list-btn">
-            <div class="plus-icon">+</div>
+            <div class="plus-icon">
+                <i class="bi bi-plus-lg"></i>
+            </div>
             <p>New List</p>
         </div>
     </main>
@@ -48,7 +77,6 @@
             <button class="add" type="submit">Add</button>
         </div>
     </dialog>
-    <dialog class="todo-list"></dialog>
     <dialog class="todo-task"></dialog>
 
     <script src="script.js"></script>
