@@ -59,14 +59,19 @@ input {
         transition: all .3s ease-out;
     }
     &:hover .icon-name {
+        
+
+    }
+    .bi-trash3:hover {
+        color: var(--red);
+        transition: all .3s ease-out;
         display: block;
         transition: all .3s ease-out;
 
     }
-    &:hover .bi-trash3 {
-        color: var(--red);
+    .bi-pencil:hover {
+        color: var(--blue);
         transition: all .3s ease-out;
-
     }
 }
 
@@ -199,7 +204,7 @@ main {
         } 
         
     }
-    .new-list-btn {
+.check-icon, .new-list-btn {
         display: flex;
         gap: 1rem;
         font-size: 1.25rem;
@@ -211,10 +216,19 @@ main {
         z-index: 100;
     }
 }
+.check-icon {
+    .bi-check2 {
+        font-size: 3rem;
+        /* display: none; */
+    }
+    
+}
+
 
 input[type="date"]::-webkit-calendar-picker-indicator, input[type="time"]::-webkit-calendar-picker-indicator {
     filter: invert(1); 
     cursor: pointer;
+    font-size: 1.25rem;
 }
 
 dialog {

@@ -9,15 +9,20 @@ let deleteList = document.querySelector(".bi-trash3");
 let editList = document.querySelector(".bi-pencil");
 let listName = document.querySelector(".list-name");
 let listAmount = document.querySelector(".amount");
+let checkIcon = document.querySelector(".check-icon i");
+let checkIconCont = document.querySelector(".check-icon");
+
 
 let currentListName = '';
 let defaultList = true;
+
+
 function openDialog() {
     newListDialog.showModal();
     listTitle.value = "";
 }
 function getTaskPageContent(){
-    return listCont.innerHTML = `
+    let taskPageContent = `
         <div class="task-header">
             <div class="left-content">
                 <i class="bi bi-arrow-left back-task-btn"></i>
@@ -30,7 +35,7 @@ function getTaskPageContent(){
         <div class="description-cont">
             <label>
                 Task Description:
-                <input type="text" class="description" placeholder="e.g Read book 20 minutes per day">
+                <input type="text" class="description" required placeholder="e.g Read book 20 minutes per day">
             </label>
             <label>
                 Due Date:
@@ -43,15 +48,22 @@ function getTaskPageContent(){
             <div class="repeate-options-cont">
                 <p>Select Repeate Options</p>
                 <select name="repeate-options" class="repeate-options">
-                    <option value="no-repeate">No Repeate</option>
-                    <option value="everyday">Everyday</option>
-                    <option value="per-week">Per Week</option>
-                    <option value="per-month">Per Month</option>
+                    <option value="Once">No Repeate</option>
+                    <option value="Everyday">Everyday</option>
+                    <option value="Per week">Per Week</option>
+                    <option value="Per month">Per Month</option>
                 </select>
             </div>
         </div>     
     `;
+    listCont.innerHTML = taskPageContent;
+    toggleIcons("none", "inline-block");
 }
+function toggleIcons(newListBtnState, checkIconState){
+    newListBtn.style.display= newListBtnState;
+    checkIcon.style.display = checkIconState;
+}
+
 
 class List {
     listArray = [`
@@ -95,6 +107,8 @@ class List {
                     localStorage.setItem(this.listKey, JSON.stringify(this.listArray));
                 }
                 this.getStorageList();
+                toggleIcons("flex", "none");
+
             
         });
     }
@@ -153,7 +167,6 @@ class List {
                 this.newTodoListName = listTitleValue;
                 this.addToStorage();
                 this.getStorageList();
-    
                 newListDialog.close();                
             }
     }
@@ -177,20 +190,21 @@ class List {
 }
 
 class Task {
+    takContentArray = [];
+    takStorageKey = "task key";
     getClickedList() {
         document.addEventListener("click", (e) => {
             let clickedList = e.target.closest(".list"); 
-            console.log(clickedList);
             if (clickedList) {
                 let listId = clickedList.dataset.listId; 
                 let listName = clickedList.querySelector(".list-name").textContent; 
                 currentListName = listName;
                 if (listId > 2){
-                    listCont.innerHTML = this.openCreatedTaskPage(listName);
+                    this.openCreatedTaskPage(listName);
                     defaultList = false;
                 }                
                 else {
-                    listCont.innerHTML = this.openDefaultTaskPage(listName);
+                    this.openDefaultTaskPage(listName);
                     defaultList = true;
                 }
                 this.createNewTaskBtn();
@@ -204,7 +218,7 @@ class Task {
         newListBtn.removeEventListener("click", openDialog);
     }
     openDefaultTaskPage(listName) {
-        return `
+        listCont.innerHTML = `
             <div class="task-header">
                 <div class="left-content">
                     <i class="bi bi-arrow-left back-home-btn"></i>
@@ -212,9 +226,11 @@ class Task {
                 </div>
             </div>
         `;
+        toggleIcons("flex", "none");
+
     }
     openCreatedTaskPage(listName) {
-        return `
+        listCont.innerHTML = `
             <div class="task-header">
                 <div class="left-content">
                     <i class="bi bi-arrow-left back-home-btn"></i>
@@ -226,13 +242,69 @@ class Task {
                 </div>
             </div>
         `;
+        toggleIcons("flex", "none");
+
     }
     
     openTaskPage(){
         newListBtn.addEventListener("click", getTaskPageContent);
     }
+    
+    createTask(description, date, time, repeate){
+        if (description) {
+            return `            
+                <div class="task">
+                    <div class="left-content">
+                        <input type="checkbox" class="checkbox">
+                        <div class="descripton-cont">
+                            <h4 class="decription">${description}</h4>
+                            <p>${date} ${time} ${repeate}</p>
+                        </div>
+                    </div>
+                    <div class="right-content">
+                        <i class="bi bi-star-fill"></i>
+                    </div>                
+                </div>                
+            `; 
+        }
+        
+    }
+    addTaskToStorage(){
+        // this.takContentArray.push(this.createTask());
+        // localStorage.setItem(this.takStorageKey, JSON.stringify())
+    }
+    addTask() {
+        checkIconCont.addEventListener("click", ()=>{
+            let description = document.querySelector(".description");
+            let date = document.querySelector(".date");
+            let time = document.querySelector(".time");
+            let repeate = document.querySelector(".repeate-options");
+            console.log(repeate.value);
+            
+            let newTask = this.createTask(description.value, date.value, time.value, repeate.value)
+                if (defaultList){
+                    this.openDefaultTaskPage(currentListName);
+                }
+                else {
+                    this.openCreatedTaskPage(currentListName);
+                }
+                let taskCont = document.createElement("div");
+                taskCont.classList.add(".task-cont");
+                taskCont.innerHTML = newTask;
+                console.log(newTask);
+                listCont.appendChild(taskCont);
+                
+            });
+    }
+    displayTaskContent(){
+        let taskCont = document.createElement("div");
+        taskCont.classList.add(".task-cont");
+        taskCont.innerHTML = this.createTask();
+        listAmount.innerHTML = taskCont;
+    }
     showTask() {
         this.getClickedList(); 
+        this.addTask();
     }
 }
 
@@ -244,30 +316,37 @@ class TodoList{
     moveToHomeSection () {
         document.addEventListener("click", (e)=>{
             let clickedList = e.target.closest(".back-home-btn");
-            console.log(clickedList);
             if (clickedList) {
                 this.list.getStorageList();
                 this.list.openTodoDialog();
                 newListBtn.removeEventListener("click", getTaskPageContent);
                 newListBtnText.innerHTML = "New List";
+                toggleIcons("flex", "none");
             }
         });  
     }
 
     moveToTaskSection(){
         document.addEventListener("click", (e)=>{
-            let clickedList = e.target.closest(".back-task-btn");
-            console.log(clickedList);
-            if (clickedList) {
+            let clickedBtn = e.target.closest(".back-task-btn");
+            if (clickedBtn) {
                 if (!defaultList){
-                    listCont.innerHTML = this.task.openCreatedTaskPage(currentListName);
+                    this.task.openCreatedTaskPage(currentListName);
                 }                
                 else {
-                    listCont.innerHTML = this.task.openDefaultTaskPage(currentListName);
+                    this.task.openDefaultTaskPage(currentListName);
                 }
+                newListBtn.innerHTML =`
+                        <div class="plus-icon">
+                            <i class="bi bi-plus-lg"></i>
+                        </div>
+                        <p>New Task</p>
+                `;
+
             }
         }); 
     }
+    
 
     showList() {
         this.list.showList();
