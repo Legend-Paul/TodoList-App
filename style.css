@@ -166,6 +166,16 @@ main {
                             font-size: 1.2rem;
                             margin-bottom: .5rem;
                         }
+                        
+                        .description-mini-info {
+                            display: flex;
+                            gap: .5rem;
+                            
+                            p{
+                                font-size: .85rem;
+                                color: var(--green);
+                            }
+                        }
                     }
                 }
                 .right-content {

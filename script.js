@@ -107,9 +107,7 @@ class List {
                     localStorage.setItem(this.listKey, JSON.stringify(this.listArray));
                 }
                 this.getStorageList();
-                toggleIcons("flex", "none");
-
-            
+                toggleIcons("flex", "none");            
         });
     }
 
@@ -133,7 +131,6 @@ class List {
             </div>                
             <p class="amount"></p>
             `;
-        
     }
 
     addToStorage(){
@@ -190,8 +187,8 @@ class List {
 }
 
 class Task {
-    takContentArray = [];
-    takStorageKey = "task key";
+    taskContentObj = {};
+    taskStorageKey = "task key";
     getClickedList() {
         document.addEventListener("click", (e) => {
             let clickedList = e.target.closest(".list"); 
@@ -209,6 +206,7 @@ class Task {
                 }
                 this.createNewTaskBtn();
                 this.openTaskPage();
+                this.displayStoredTaskOnLoad();
             }
         });
     }
@@ -251,49 +249,107 @@ class Task {
     }
     
     createTask(description, date, time, repeate){
+        time =  `   ${time}   `;
         if (description) {
-            return `            
+            return `                  
                 <div class="task">
                     <div class="left-content">
                         <input type="checkbox" class="checkbox">
                         <div class="descripton-cont">
                             <h4 class="decription">${description}</h4>
-                            <p>${date} ${time} ${repeate}</p>
+                            <div class="description-mini-info">
+                                <p>${date}</p> <p>${time}</p> <p>${repeate}</p>
+                            </div>
                         </div>
                     </div>
                     <div class="right-content">
                         <i class="bi bi-star-fill"></i>
                     </div>                
-                </div>                
+                </div>                 
+                             
+            
             `; 
         }
         
     }
-    addTaskToStorage(){
-        // this.takContentArray.push(this.createTask());
-        // localStorage.setItem(this.takStorageKey, JSON.stringify())
+    displayStoredTaskOnLoad(){
+        let currentTaskArray = this.checkTaskInStorage();    
+        if (currentTaskArray === undefined){        
+            this.taskContentObj[currentListName] = [];
+            localStorage.setItem(this.taskStorageKey, JSON.stringify(this.taskContentObj));
+            
+        }
+        else{        
+             this.displayStoredTask();
+        }
+        this.checkTaskInStorage();    
     }
-    addTask() {
+    checkTaskInStorage(){
+        let storedTask = localStorage.getItem(this.taskStorageKey);
+        this.taskContentObj = storedTask ? JSON.parse(storedTask) : {};
+        let currentTaskArray = this.taskContentObj[currentListName];
+        return currentTaskArray;
+    }
+
+    checkCompleteTask() {
+        checkIconCont.addEventListener("click", ()=>{
+            let checkbox = document.querySelector(".checkbox");
+            checkbox.addEventListener("click", (e)=>{
+                let task = e.target.closest(".task");
+                task.classList.toggle("checked");
+            });
+        });     
+    }
+    
+    addTaskToStorage(newTask){
+        let currentTaskArray = this.checkTaskInStorage();
+        if (currentTaskArray){
+            this.taskContentObj[currentListName].push(newTask);
+            localStorage.setItem(this.taskStorageKey, JSON.stringify(this.taskContentObj))
+        }
+        this.checkTaskInStorage();    
+
+        
+    }
+    displayStoredTask(){
+        let currentTaskArray = this.checkTaskInStorage();
+        let taskCont = document.createElement("div");
+        taskCont.classList.add("task-cont");
+        let taskDataId = 0;
+        currentTaskArray.forEach((taskContent)=>{
+            let div = document.createElement("div");
+            div.setAttribute("data-list-id", taskDataId);
+            div.innerHTML = taskContent;
+            taskCont.appendChild(div);
+            listCont.appendChild(taskCont);
+            taskDataId++;
+
+        });
+        return listCont;
+    }
+
+
+    rederTask() {
         checkIconCont.addEventListener("click", ()=>{
             let description = document.querySelector(".description");
             let date = document.querySelector(".date");
             let time = document.querySelector(".time");
-            let repeate = document.querySelector(".repeate-options");
-            console.log(repeate.value);
-            
-            let newTask = this.createTask(description.value, date.value, time.value, repeate.value)
-                if (defaultList){
+            let repeate = document.querySelector(".repeate-options");      
+            let newTask = this.createTask(description.value, date.value, time.value, repeate.value);
+        
+            if (defaultList){
                     this.openDefaultTaskPage(currentListName);
                 }
                 else {
                     this.openCreatedTaskPage(currentListName);
                 }
-                let taskCont = document.createElement("div");
-                taskCont.classList.add(".task-cont");
-                taskCont.innerHTML = newTask;
-                console.log(newTask);
-                listCont.appendChild(taskCont);
-                
+                this.addTaskToStorage(newTask);
+
+                let currentTaskArray = this.checkTaskInStorage();            
+                if (currentTaskArray){
+                    this.displayStoredTask();
+                }
+                ;
             });
     }
     displayTaskContent(){
@@ -304,7 +360,7 @@ class Task {
     }
     showTask() {
         this.getClickedList(); 
-        this.addTask();
+        this.rederTask();
     }
 }
 
@@ -323,6 +379,7 @@ class TodoList{
                 newListBtnText.innerHTML = "New List";
                 toggleIcons("flex", "none");
             }
+            
         });  
     }
 
@@ -336,6 +393,7 @@ class TodoList{
                 else {
                     this.task.openDefaultTaskPage(currentListName);
                 }
+                this.task.displayStoredTaskOnLoad();
                 newListBtn.innerHTML =`
                         <div class="plus-icon">
                             <i class="bi bi-plus-lg"></i>
