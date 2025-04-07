@@ -5,21 +5,25 @@ let addTodoListBtn = document.querySelector(".add");
 let cancelDialog = document.querySelector(".cancel");
 let listCont =document.querySelector(".list-cont");
 let newListBtnText = document.querySelector(".new-list-btn p");
-let deleteList = document.querySelector(".bi-trash3");
-let editList = document.querySelector(".bi-pencil");
 let listName = document.querySelector(".list-name");
 let listAmount = document.querySelector(".amount");
 let checkIcon = document.querySelector(".check-icon i");
 let checkIconCont = document.querySelector(".check-icon");
+let editListDialog = document.querySelector(".edit-list-dialog");
+let addEditBtn = document.querySelector(".add-edit");
+let newListError = document.querySelector(".new-list-error");
 
 
 let currentListName = '';
+let currentListId = '';
 let defaultList = true;
 
 
 function openDialog() {
     newListDialog.showModal();
     listTitle.value = "";
+    newListError.innerHTML = "";
+    newListError.style.padding = "0";
 }
 function getTaskPageContent(){
     let taskPageContent = `
@@ -116,9 +120,14 @@ class List {
     }
     
     closeTodoDialog(){
-        cancelDialog.addEventListener("click", ()=>{
-            newListDialog.close();
-        });
+        document.addEventListener("click", (e)=>{
+            let clickedBtn = e.target.closest(".cancel");
+            if (clickedBtn) {
+                newListDialog.close();
+                editListDialog.close();
+            }
+        }
+        );
     }
 
     createNewList(){
@@ -154,27 +163,43 @@ class List {
                 listDataId++;
                 newList.innerHTML = list; 
                 listCont.appendChild(newList);
-            }
-            
+            } 
         });
     }
-    addNewList(){
-        let listTitleValue = listTitle.value;        
-            if (listTitleValue){
-                this.newTodoListName = listTitleValue;
-                this.addToStorage();
-                this.getStorageList();
-                newListDialog.close();                
-            }
-    }
-    displayNewList(){
-        document.addEventListener("keyup", (e)=>{
-            if (e.key == "Enter"){
-                this.addNewList();                
+    
+    editListName() {
+        document.addEventListener("click", (e) => {
+            let clickedBtn = e.target.closest(".edit-list");
+            if (clickedBtn) {
+                console.log("Edit button clicked:", clickedBtn);                
+                console.log("Current List Name:", currentListName);                
+                editListDialog.showModal();                
+                listTitle.value = currentListName;                
+                listTitle.focus();
+                listTitle.select();
+                console.log("Updated List Title Value:", listTitle.value);
             }
         });
-        addTodoListBtn.addEventListener("click", ()=>{
-            this.addNewList();
+    }
+    
+    deleteList() {
+        document.addEventListener("click", (e) => {
+            let clickedBtn = e.target.closest(".delete-list");
+            if (clickedBtn) {    
+                if (!isNaN(currentListId)) {    
+                    let allList = localStorage.getItem(this.listKey);
+                    let deletedListId = parseInt(currentListId);
+                    if (allList){
+                        this.listArray = JSON.parse(allList);                        
+                        this.listArray.splice(deletedListId - 2, 1);                        
+                        localStorage.setItem(this.listKey, JSON.stringify(this.listArray));
+                        this.getStorageList();
+                        this.openTodoDialog();
+                        newListBtn.removeEventListener("click", getTaskPageContent);
+                        newListBtnText.innerHTML = "New List";
+                    }
+                } 
+            }
         });
     }
     
@@ -182,7 +207,8 @@ class List {
         this.displayListOnLoad();
         this.openTodoDialog();
         this.closeTodoDialog();
-        this.displayNewList();
+        this.deleteList();
+        this.editListName();        
     }
 }
 
@@ -196,6 +222,7 @@ class Task {
                 let listId = clickedList.dataset.listId; 
                 let listName = clickedList.querySelector(".list-name").textContent; 
                 currentListName = listName;
+                currentListId = listId;
                 if (listId > 2){
                     this.openCreatedTaskPage(listName);
                     defaultList = false;
@@ -206,7 +233,8 @@ class Task {
                 }
                 this.createNewTaskBtn();
                 this.openTaskPage();
-                this.displayStoredTaskOnLoad();
+                this.displayStoredTask();
+                // this.displayStoredTaskOnLoad();
             }
         });
     }
@@ -235,8 +263,8 @@ class Task {
                     <h1>${listName}</h1>
                 </div>
                 <div class="right-content">
-                    <i class="bi bi-trash3"></i>
-                    <i class="bi bi-pencil"></i>
+                    <i class="bi bi-trash3 delete-list"></i>
+                    <i class="bi bi-pencil edit-list"></i>
                 </div>
             </div>
         `;
@@ -272,22 +300,23 @@ class Task {
         }
         
     }
-    displayStoredTaskOnLoad(){
-        let currentTaskArray = this.checkTaskInStorage();    
-        if (currentTaskArray === undefined){        
-            this.taskContentObj[currentListName] = [];
-            localStorage.setItem(this.taskStorageKey, JSON.stringify(this.taskContentObj));
+    // displayStoredTaskOnLoad(listName){
+    //     let currentTaskArray = this.task.checkTaskInStorage();    
+    //     if (currentTaskArray === undefined){        
+    //         this.task.taskContentObj[listName] = [];
+    //         localStorage.setItem(this.task.taskStorageKey, JSON.stringify(this.task.taskContentObj));
             
-        }
-        else{        
-             this.displayStoredTask();
-        }
-        this.checkTaskInStorage();    
-    }
-    checkTaskInStorage(){
+    //     }
+    //     else{        
+    //          this.task.displayStoredTask();
+    //     }
+    //     this.task.checkTaskInStorage();    
+    // }
+    checkTaskInStorage(listName){
         let storedTask = localStorage.getItem(this.taskStorageKey);
         this.taskContentObj = storedTask ? JSON.parse(storedTask) : {};
-        let currentTaskArray = this.taskContentObj[currentListName];
+        let currentTaskArray = this.taskContentObj[listName];
+        console.log(currentTaskArray);
         return currentTaskArray;
     }
 
@@ -358,6 +387,7 @@ class Task {
         taskCont.innerHTML = this.createTask();
         listAmount.innerHTML = taskCont;
     }
+    
     showTask() {
         this.getClickedList(); 
         this.rederTask();
@@ -368,6 +398,43 @@ class TodoList{
     constructor() {
         this.list = new List();
         this.task = new Task();
+    }
+    addNewList(){
+        let listTitleValue = listTitle.value;  
+        this.list.getStorageList();   
+        let listTaskArray = this.checkListNameInObj(listTitleValue);
+        
+            if (listTitleValue && listTaskArray == null){
+                this.list.newTodoListName = listTitleValue;
+                this.list.addToStorage();
+                this.list.getStorageList();
+                newListDialog.close();  
+                this.task.taskContentObj[listTitleValue] = [];
+                localStorage.setItem(this.task.taskStorageKey, JSON.stringify(this.task.taskContentObj))
+               
+            }
+            else {
+                newListError.innerHTML =  `${listTitleValue} already exixt`;
+                newListError.style.padding = ".5rem";
+            }
+            
+    }
+    checkListNameInObj(listName){
+        let storedListName = localStorage.getItem(this.task.taskStorageKey);
+        this.task.taskContentObj = storedListName ? JSON.parse(storedListName) : {};        
+        let currentTaskArray = this.task.taskContentObj[listName];
+        return currentTaskArray;
+          
+    }
+    displayNewList(){
+        document.addEventListener("keyup", (e)=>{
+            if (e.key == "Enter"){
+                this.addNewList();                
+            }
+        });
+        addTodoListBtn.addEventListener("click", ()=>{
+            this.addNewList();
+        });
     }
     moveToHomeSection () {
         document.addEventListener("click", (e)=>{
@@ -393,7 +460,7 @@ class TodoList{
                 else {
                     this.task.openDefaultTaskPage(currentListName);
                 }
-                this.task.displayStoredTaskOnLoad();
+                // this.task.displayStoredTaskOnLoad();
                 newListBtn.innerHTML =`
                         <div class="plus-icon">
                             <i class="bi bi-plus-lg"></i>
@@ -409,6 +476,7 @@ class TodoList{
     showList() {
         this.list.showList();
         this.task.showTask();
+        this.displayNewList();
         this.moveToHomeSection();
         this.moveToTaskSection();
     }
