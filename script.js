@@ -30,6 +30,7 @@ function getTaskPageContent(){
         <div class="task-header">
             <div class="left-content">
                 <i class="bi bi-arrow-left back-task-btn"></i>
+                <h1>${currentListName}</h1>
             </div>
             <div class="right-content">
                 <i class="bi bi-trash3"></i>
@@ -170,14 +171,11 @@ class List {
     editListName() {
         document.addEventListener("click", (e) => {
             let clickedBtn = e.target.closest(".edit-list");
-            if (clickedBtn) {
-                console.log("Edit button clicked:", clickedBtn);                
-                console.log("Current List Name:", currentListName);                
+            if (clickedBtn) {                                
                 editListDialog.showModal();                
                 listTitle.value = currentListName;                
                 listTitle.focus();
-                listTitle.select();
-                console.log("Updated List Title Value:", listTitle.value);
+                listTitle.select();                
             }
         });
     }
@@ -233,7 +231,8 @@ class Task {
                 }
                 this.createNewTaskBtn();
                 this.openTaskPage();
-                this.displayStoredTask();
+                // this.displayStoredTask();
+                this.displayStoredTask(currentListName);
                 // this.displayStoredTaskOnLoad();
             }
         });
@@ -300,23 +299,23 @@ class Task {
         }
         
     }
-    // displayStoredTaskOnLoad(listName){
-    //     let currentTaskArray = this.task.checkTaskInStorage();    
-    //     if (currentTaskArray === undefined){        
-    //         this.task.taskContentObj[listName] = [];
-    //         localStorage.setItem(this.task.taskStorageKey, JSON.stringify(this.task.taskContentObj));
+    displayStoredTaskOnLoad(listName){
+        let currentTaskArray = this.task.checkTaskInStorage();    
+        if (currentTaskArray === undefined){        
+            this.task.taskContentObj[listName] = [];
+            localStorage.setItem(this.task.taskStorageKey, JSON.stringify(this.task.taskContentObj));
             
-    //     }
-    //     else{        
-    //          this.task.displayStoredTask();
-    //     }
-    //     this.task.checkTaskInStorage();    
-    // }
+        }
+        else{        
+             this.task.displayStoredTask();
+        }
+        this.task.checkTaskInStorage();    
+    }
+    
     checkTaskInStorage(listName){
         let storedTask = localStorage.getItem(this.taskStorageKey);
-        this.taskContentObj = storedTask ? JSON.parse(storedTask) : {};
-        let currentTaskArray = this.taskContentObj[listName];
-        console.log(currentTaskArray);
+        this.taskContentObj = JSON.parse(storedTask);
+        let currentTaskArray = this.taskContentObj[listName];                
         return currentTaskArray;
     }
 
@@ -331,7 +330,7 @@ class Task {
     }
     
     addTaskToStorage(newTask){
-        let currentTaskArray = this.checkTaskInStorage();
+        let currentTaskArray = this.checkTaskInStorage(currentListName);
         if (currentTaskArray){
             this.taskContentObj[currentListName].push(newTask);
             localStorage.setItem(this.taskStorageKey, JSON.stringify(this.taskContentObj))
@@ -340,8 +339,8 @@ class Task {
 
         
     }
-    displayStoredTask(){
-        let currentTaskArray = this.checkTaskInStorage();
+    displayStoredTask(listName){
+        let currentTaskArray = this.checkTaskInStorage(listName);
         let taskCont = document.createElement("div");
         taskCont.classList.add("task-cont");
         let taskDataId = 0;
@@ -372,13 +371,9 @@ class Task {
                 else {
                     this.openCreatedTaskPage(currentListName);
                 }
-                this.addTaskToStorage(newTask);
-
-                let currentTaskArray = this.checkTaskInStorage();            
-                if (currentTaskArray){
-                    this.displayStoredTask();
-                }
-                ;
+                this.addTaskToStorage(newTask);                
+                this.displayStoredTask(currentListName);
+            
             });
     }
     displayTaskContent(){
@@ -460,7 +455,7 @@ class TodoList{
                 else {
                     this.task.openDefaultTaskPage(currentListName);
                 }
-                // this.task.displayStoredTaskOnLoad();
+                this.task.displayStoredTask(currentListName);
                 newListBtn.innerHTML =`
                         <div class="plus-icon">
                             <i class="bi bi-plus-lg"></i>
