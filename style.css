@@ -160,6 +160,16 @@ main {
             padding-top: 4rem;
             padding-bottom: 2rem;
             gap: 1.25rem;
+            .task-headline {
+                margin-bottom: 0.5rem;
+                border-bottom: 1px solid var(--green);
+                color: var(--green);
+                display: none;
+            }
+            .task-comlete-headline {
+                display: inline-block;
+                animation: remove-task 2s ease-in-out 0.5s;
+            }
             .task {
                 padding: 0.5rem 1rem;
                 border-radius: 0.5rem;
@@ -179,6 +189,7 @@ main {
                         width: 1.25rem;
                         height: 1.25rem;
                     }
+
                     .descripton-cont {
                         h4 {
                             font-size: 1.2rem;
@@ -188,11 +199,8 @@ main {
                         .description-mini-info {
                             display: flex;
                             gap: 0.5rem;
-
-                            p {
-                                font-size: 0.85rem;
-                                color: var(--green);
-                            }
+                            font-size: 0.85rem;
+                            color: var(--green);
                         }
                     }
                 }
@@ -290,5 +298,14 @@ dialog {
         .cancel {
             background-color: var(--red);
         }
+    }
+}
+
+@keyframes remove-task {
+    0% {
+        display: none;
+    }
+    100% {
+        display: inline-block;
     }
 }

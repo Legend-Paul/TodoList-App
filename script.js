@@ -18,7 +18,7 @@ let currentListName = "";
 let currentListId = "";
 let defaultList = true;
 // eslint-disable-next-line no-unused-vars
-let currentTaskId = "";
+let currentTaskIdx = "";
 // eslint-disable-next-line no-unused-vars
 let currentTaskName = "";
 
@@ -183,6 +183,8 @@ class List {
 class Task {
     taskContentObj = {};
     taskStorageKey = "task key";
+    checkIconContEvent = this.generateTask.bind(this);
+    checkIconEdits = this.generateTaskEdits.bind(this);
     getClickedList() {
         document.addEventListener("click", (e) => {
             let clickedList = e.target.closest(".list");
@@ -204,8 +206,61 @@ class Task {
                 // this.displayStoredTask();
                 this.displayStoredTask(currentListName);
                 // this.displayStoredTaskOnLoad();
+                this.displayTaskState();
+                this.checkCompleteTask();
             }
         });
+    }
+
+    displayTaskState() {
+        if (this.taskContentObj[currentListName]) {
+            let taskDateAndTimes = document.querySelectorAll(
+                ".description-mini-info"
+            );
+            if (taskDateAndTimes) {
+                taskDateAndTimes.forEach((taskDateAndTime) => {
+                    let taskDate = taskDateAndTime
+                        .querySelector(".task-date")
+                        .textContent.trim();
+                    let taskTime = taskDateAndTime
+                        .querySelector(".task-time")
+                        .textContent.trim();
+                    if (taskDate) {
+                        if (this.formatCurentDate() === taskDate) {
+                            if (taskTime) {
+                                if (taskTime < this.formatCurrentTime()) {
+                                    taskDateAndTime.style.color = "#e63946";
+                                }
+                            }
+                        } else if (this.formatCurentDate() > taskDate) {
+                            taskDateAndTime.style.color = "#e63946";
+                        }
+                    }
+                    if (!taskDate && taskTime) {
+                        if (taskTime < this.formatCurrentTime()) {
+                            taskDateAndTime.style.color = "#e63946";
+                        }
+                    }
+                });
+            }
+        }
+    }
+    formatCurentDate() {
+        let now = new Date();
+        let year = now.getFullYear();
+        let month = String(now.getMonth() + 1).padStart(2, "0");
+        let date = String(now.getDate()).padStart(2, "0");
+        let formattedDate = `${year}-${month}-${date}`;
+        return formattedDate;
+    }
+    formatCurrentTime() {
+        let now = new Date();
+        let formattedTime = now.toLocaleTimeString("en-US", {
+            hour12: false,
+            hour: "2-digit",
+            minute: "2-digit",
+        });
+        return formattedTime;
     }
 
     createNewTaskBtn() {
@@ -251,16 +306,17 @@ class Task {
     createTask(description, date, time, repeate) {
         time = `   ${time}   `;
         if (description) {
-            return `                  
+            return `  
+                <p class="task-headline">Task Completed.</p>                
                 <div class="task">
                     <div class="left-content">
                         <input type="checkbox" class="checkbox">
                         <div class="descripton-cont">
                             <h4 class="task-decription">${description}</h4>
                             <div class="description-mini-info">
-                                <p class=""task-date">${date}</p>
-                                <p class=""task-time">${time}</p>
-                                <p class=""task-repeate-option">${repeate}</p>
+                                <p class="task-date">${date}</p>
+                                <p class="task-time">${time}</p>
+                                <p class="task-repeate-option">${repeate}</p>
                             </div>
                         </div>
                     </div>
@@ -303,15 +359,23 @@ class Task {
     }
 
     checkCompleteTask() {
-        checkIconCont.addEventListener("click", () => {
-            let checkbox = document.querySelector(".checkbox");
-            checkbox.addEventListener("click", (e) => {
-                let task = e.target.closest(".task");
-                task.classList.toggle("checked");
+        let checkBoxes = document.querySelectorAll(".checkbox");
+        if (checkBoxes) {
+            checkBoxes.forEach((checkBox, i) => {
+                console.log(checkBox.checked);
+                checkBox.addEventListener("click", () => {
+                    let taskCont = document.querySelectorAll(".task")[i];
+                    let comletedTaskHeadline =
+                        document.querySelectorAll(".task-headline")[i];
+                    console.log(comletedTaskHeadline);
+                    comletedTaskHeadline.classList.toggle(
+                        "task-comlete-headline"
+                    );
+                    taskCont.classList.toggle("complete-task");
+                });
             });
-        });
+        }
     }
-
     addTaskToStorage(newTask) {
         let currentTaskArray = this.checkTaskInStorage(currentListName);
         if (currentTaskArray) {
@@ -343,28 +407,33 @@ class Task {
         return listCont;
     }
 
-    rederTask() {
-        checkIconCont.addEventListener("click", () => {
-            let description = document.querySelector(".description");
-            let date = document.querySelector(".date");
-            let time = document.querySelector(".time");
-            let repeate = document.querySelector(".repeate-options");
-            let newTask = this.createTask(
-                description.value,
-                date.value,
-                time.value,
-                repeate.value
-            );
+    generateTask() {
+        let description = document.querySelector(".description");
+        let date = document.querySelector(".date");
+        let time = document.querySelector(".time");
+        let repeate = document.querySelector(".repeate-options");
+        let newTask = this.createTask(
+            description.value,
+            date.value,
+            time.value,
+            repeate.value
+        );
 
-            if (defaultList) {
-                this.openDefaultTaskPage(currentListName);
-            } else {
-                this.openCreatedTaskPage(currentListName);
-            }
-            this.addTaskToStorage(newTask);
-            this.displayStoredTask(currentListName);
-        });
+        if (defaultList) {
+            this.openDefaultTaskPage(currentListName);
+        } else {
+            this.openCreatedTaskPage(currentListName);
+        }
+        this.addTaskToStorage(newTask);
+        this.displayStoredTask(currentListName);
+        this.displayTaskState();
+        this.displayTaskState();
     }
+
+    rederTask() {
+        checkIconCont.addEventListener("click", this.checkIconContEvent);
+    }
+
     displayTaskContent() {
         let taskCont = document.createElement("div");
         taskCont.classList.add(".task-cont");
@@ -394,11 +463,12 @@ class Task {
                 let descriptionValue =
                     taskCont.querySelector(".task-decription").textContent;
                 let dateValue =
-                    taskCont.querySelector(".task-decription").textContent;
+                    taskCont.querySelector(".task-date").textContent;
                 let timeValue =
-                    taskCont.querySelector(".task-decription").textContent;
-                let repeateOptionValue =
-                    taskCont.querySelector(".task-decription").textContent;
+                    taskCont.querySelector(".task-time").textContent;
+                let repeateOptionValue = taskCont.querySelector(
+                    ".task-repeate-option"
+                ).textContent;
                 getTaskPageContent();
                 document.querySelector(".delete-task").style.display =
                     "inline-block";
@@ -409,28 +479,32 @@ class Task {
                 let date = document.querySelector(".date");
                 date.value = dateValue;
                 let time = document.querySelector(".time");
-                time.value = timeValue;
+                if (dateValue) {
+                    date.value = dateValue;
+                }
+
+                if (timeValue) {
+                    time.value = timeValue.trim();
+                }
                 let repeate = document.querySelector(".repeate-options");
                 repeate.value = repeateOptionValue;
                 let taskIdx = Array.from(taskCont.parentNode.children).indexOf(
                     taskCont
                 );
-                let idx = taskIdx;
-                console.log("Task Id: " + idx);
-                this.deleteTask(taskIdx);
+                currentTaskIdx = taskIdx;
+                this.deleteTask();
+
+                this.editTaskContent();
             }
         });
     }
 
-    removeTask(taskIdx) {
+    removeTask() {
         let allTask = localStorage.getItem(this.taskStorageKey);
+        let taskIdx = parseInt(currentTaskIdx);
         if (allTask) {
-            taskIdx = parseInt(taskIdx);
             this.taskContentObj = JSON.parse(allTask);
-            console.log(this.taskContentObj[currentListName].length);
-            console.log("Remove Task Id: " + taskIdx);
             this.taskContentObj[currentListName].splice(taskIdx, 1);
-            console.log(this.taskContentObj[currentListName].length);
             localStorage.setItem(
                 this.taskStorageKey,
                 JSON.stringify(this.taskContentObj)
@@ -439,27 +513,61 @@ class Task {
             this.moveBackTocreateTask();
         }
     }
-    deleteTask(taskIdx) {
+    deleteTask() {
         const deleteTaskBtn = document.querySelector(".delete-task");
-        const newDeleteTaskHandler = (e) => {
+        const deletingTask = () => {
             if (confirm("Are you sure you want to delete this Task?")) {
-                this.removeTask(taskIdx);
-                deleteTaskBtn.removeEventListener(
+                this.removeTask();
+                checkIconCont.removeEventListener("click", this.checkIconEdits);
+                checkIconCont.addEventListener(
                     "click",
-                    newDeleteTaskHandler
+                    this.checkIconContEvent
                 );
+                this.displayTaskState();
+                deleteTaskBtn.removeEventListener("click", deletingTask);
             }
         };
 
-        deleteTaskBtn.removeEventListener("click", newDeleteTaskHandler); // Ensure no duplicate listeners
-        deleteTaskBtn.addEventListener("click", newDeleteTaskHandler);
+        deleteTaskBtn.removeEventListener("click", deletingTask); // Ensure no duplicate listeners
+        deleteTaskBtn.addEventListener("click", deletingTask);
+    }
+    generateTaskEdits() {
+        let description = document.querySelector(".description");
+        let date = document.querySelector(".date");
+        let time = document.querySelector(".time");
+        let repeate = document.querySelector(".repeate-options");
+        let editedTask = this.createTask(
+            description.value,
+            date.value,
+            time.value,
+            repeate.value
+        );
+        let taskIdx = parseInt(currentTaskIdx);
+        let storedTask = localStorage.getItem(this.taskStorageKey);
+        this.taskContentObj = JSON.parse(storedTask);
+        let listToEdit = this.taskContentObj[currentListName];
+        let editedList = listToEdit.toSpliced(taskIdx, 1, editedTask);
+        this.taskContentObj[currentListName] = editedList;
+        this.updateTaskStorage();
+        if (defaultList) {
+            this.openDefaultTaskPage(currentListName);
+        } else {
+            this.openCreatedTaskPage(currentListName);
+        }
+        this.displayStoredTask(currentListName);
+        this.displayTaskState();
+        this.displayTaskState();
+    }
+    editTaskContent() {
+        checkIconCont.removeEventListener("click", this.checkIconContEvent);
+        checkIconCont.addEventListener("click", this.checkIconEdits);
     }
     showTask() {
         this.getClickedList();
         this.createDefaultListStorage();
         this.rederTask();
         this.openTask();
-        // this.deleteTask();
+        this.displayTaskState();
     }
 }
 
@@ -474,7 +582,6 @@ class TodoList {
         let listTaskArray = this.checkListNameInObj(listTitleValue);
         if (listTitleValue) {
             let listTitle = listTitleValue.toLowerCase();
-            console.log(listTitle);
         }
 
         if (listTitleValue && listTaskArray == null) {
@@ -531,6 +638,7 @@ class TodoList {
             let clickedBtn = e.target.closest(".back-task-btn");
             if (clickedBtn) {
                 this.task.moveBackTocreateTask();
+                this.task.displayTaskState();
             }
         });
     }
