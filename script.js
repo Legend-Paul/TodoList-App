@@ -525,6 +525,7 @@ class Task {
                 );
                 this.displayTaskState();
                 deleteTaskBtn.removeEventListener("click", deletingTask);
+                this.checkCompleteTask();
             }
         };
 
@@ -580,9 +581,6 @@ class TodoList {
         let listTitleValue = listTitle.value;
         this.list.getStorageList();
         let listTaskArray = this.checkListNameInObj(listTitleValue);
-        if (listTitleValue) {
-            let listTitle = listTitleValue.toLowerCase();
-        }
 
         if (listTitleValue && listTaskArray == null) {
             this.list.newTodoListName = listTitleValue;
@@ -619,7 +617,6 @@ class TodoList {
         });
     }
 
-    displayListOnLoad() {}
     moveToHomeSection() {
         document.addEventListener("click", (e) => {
             let clickedList = e.target.closest(".back-home-btn");
@@ -639,6 +636,7 @@ class TodoList {
             if (clickedBtn) {
                 this.task.moveBackTocreateTask();
                 this.task.displayTaskState();
+                this.task.checkCompleteTask();
             }
         });
     }
