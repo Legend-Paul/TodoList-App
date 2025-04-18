@@ -2,10 +2,8 @@ let newListBtn = document.querySelector(".new-list-btn");
 let newListDialog = document.querySelector(".new-list-dialog");
 let listTitle = document.querySelector(".list-title");
 let addTodoListBtn = document.querySelector(".add");
-let cancelDialog = document.querySelector(".cancel");
 let listCont = document.querySelector(".list-cont");
 let newListBtnText = document.querySelector(".new-list-btn p");
-let listName = document.querySelector(".list-name");
 let listAmount = document.querySelector(".amount");
 let checkIcon = document.querySelector(".check-icon i");
 let checkIconCont = document.querySelector(".check-icon");
@@ -18,8 +16,6 @@ let currentListName = "";
 let currentListId = "";
 let defaultList = true;
 let currentTaskIdx = "";
-// eslint-disable-next-line no-unused-vars
-let currentTaskName = "";
 
 let addListByEnterKey = (e) => {
     if (e.key === "Enter") {
@@ -27,9 +23,28 @@ let addListByEnterKey = (e) => {
     }
 };
 
+function editListTitleName() {
+    let newListName = editListTitle.value;
+    if (newListName) {
+        todoList.editListArray(newListName);
+        todoList.editTaskContentObj(newListName);
+    }
+}
+let editListByEnterKey = (e) => {
+    if (e.key === "Enter") {
+        editListTitleName();
+    }
+};
+
 let addTaskByEnterkey = (e) => {
     if (e.key === "Enter") {
         todoList.task.checkIconContEvent();
+    }
+};
+
+let editTaskByEnterKey = (e) => {
+    if (e.key === "Enter") {
+        todoList.task.checkIconEdits();
     }
 };
 
@@ -85,7 +100,9 @@ function getTaskPageContent() {
     listCont.innerHTML = taskPageContent;
     toggleIcons("none", "inline-block");
     document.addEventListener("keyup", addTaskByEnterkey);
+    document.removeEventListener("keyup", editTaskByEnterKey);
 }
+
 function toggleIcons(newListBtnState, checkIconState) {
     newListBtn.style.display = newListBtnState;
     checkIcon.style.display = checkIconState;
@@ -313,6 +330,7 @@ class Task {
 
     openTaskPage() {
         newListBtn.addEventListener("click", getTaskPageContent);
+        document.removeEventListener("keyup", editListByEnterKey);
     }
 
     createTask(description, date, time, repeate) {
@@ -467,7 +485,7 @@ class Task {
             <p>New Task</p>
     `;
     }
-    openTask() {
+    openEditTaskPage() {
         document.addEventListener("click", (e) => {
             let clickedTask = e.target.closest(".edit-task");
             if (clickedTask) {
@@ -505,8 +523,9 @@ class Task {
                 );
                 currentTaskIdx = taskIdx;
                 this.deleteTask();
-
                 this.editTaskContent();
+                document.removeEventListener("keyup", addTaskByEnterkey);
+                document.addEventListener("keyup", editTaskByEnterKey);
             }
         });
     }
@@ -580,7 +599,7 @@ class Task {
         this.getClickedList();
         this.createDefaultListStorage();
         this.rederTask();
-        this.openTask();
+        this.openEditTaskPage();
         this.displayTaskState();
     }
 }
@@ -658,6 +677,7 @@ class TodoList {
                 editListTitle.value = currentListName;
                 editListTitle.focus();
                 editListTitle.select();
+                document.addEventListener("keyup", editListByEnterKey);
             }
         });
     }
@@ -682,13 +702,7 @@ class TodoList {
         this.task.updateTaskStorage();
     }
     addEditListName() {
-        addEditBtn.addEventListener("click", () => {
-            let newListName = editListTitle.value;
-            if (newListName) {
-                this.editListArray(newListName);
-                this.editTaskContentObj(newListName);
-            }
-        });
+        addEditBtn.addEventListener("click", editListTitleName);
     }
 
     removeListFromObj() {
