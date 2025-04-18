@@ -102,6 +102,7 @@ select {
 }
 
 main {
+    overflow: hidden;
     padding-top: 1rem;
     width: min(100rem, 80%);
     margin: auto;
@@ -140,7 +141,7 @@ main {
             position: fixed;
             background-color: var(--background-color);
             top: 0;
-            width: 75%;
+            width: 80%;
             margin: auto;
             z-index: 100;
             .bi {
@@ -219,6 +220,7 @@ main {
             display: flex;
             flex-direction: column;
             gap: 2rem;
+            margin-right: 1.5rem;
             label {
                 display: flex;
                 flex-direction: column;
@@ -311,21 +313,21 @@ dialog {
 }
 
 @media screen and (width <= 1000px) {
-    main {
-        width: 90%;
+    main,
+    .task-header {
+        width: 90% !important;
         margin: auto;
-        .list,
-        .task-header {
+        .list {
             margin-left: 2.5rem !important;
         }
     }
 }
 @media screen and (width <= 600px) {
-    main {
-        width: 95%;
+    main,
+    .task-header {
+        width: 95% !important;
         margin: auto;
-        .list,
-        .task-header {
+        .list {
             margin-left: 1rem !important;
         }
     }
