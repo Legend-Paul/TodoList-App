@@ -17,16 +17,34 @@ let newListError = document.querySelector(".new-list-error");
 let currentListName = "";
 let currentListId = "";
 let defaultList = true;
-// eslint-disable-next-line no-unused-vars
 let currentTaskIdx = "";
 // eslint-disable-next-line no-unused-vars
 let currentTaskName = "";
+
+let addListByEnterKey = (e) => {
+    if (e.key === "Enter") {
+        todoList.addNewList();
+    }
+};
+
+let addTaskByEnterkey = (e) => {
+    if (e.key === "Enter") {
+        todoList.task.checkIconContEvent();
+    }
+};
 
 function openDialog() {
     newListDialog.showModal();
     listTitle.value = "";
     newListError.innerHTML = "";
     newListError.style.padding = "0";
+    document.addEventListener("keyup", addListByEnterKey);
+}
+
+function closeDialog() {
+    newListDialog.close();
+    editListDialog.close();
+    document.removeEventListener("keyup", addListByEnterKey);
 }
 function getTaskPageContent() {
     let taskPageContent = `
@@ -66,6 +84,7 @@ function getTaskPageContent() {
     `;
     listCont.innerHTML = taskPageContent;
     toggleIcons("none", "inline-block");
+    document.addEventListener("keyup", addTaskByEnterkey);
 }
 function toggleIcons(newListBtnState, checkIconState) {
     newListBtn.style.display = newListBtnState;
@@ -131,8 +150,7 @@ class List {
         document.addEventListener("click", (e) => {
             let clickedBtn = e.target.closest(".cancel");
             if (clickedBtn) {
-                newListDialog.close();
-                editListDialog.close();
+                closeDialog();
             }
         });
     }
@@ -203,9 +221,7 @@ class Task {
                 }
                 this.createNewTaskBtn();
                 this.openTaskPage();
-                // this.displayStoredTask();
                 this.displayStoredTask(currentListName);
-                // this.displayStoredTaskOnLoad();
                 this.displayTaskState();
                 this.checkCompleteTask();
             }
@@ -266,11 +282,7 @@ class Task {
     createNewTaskBtn() {
         newListBtnText.innerHTML = "New Task";
         newListBtn.removeEventListener("click", openDialog);
-        document.removeEventListener("keyup", (e) => {
-            if (e.key === "Enter") {
-                this.addNewList();
-            }
-        });
+        document.removeEventListener("keyup", addListByEnterKey);
     }
     openDefaultTaskPage(listName) {
         listCont.innerHTML = `
@@ -561,6 +573,7 @@ class Task {
     }
     editTaskContent() {
         checkIconCont.removeEventListener("click", this.checkIconContEvent);
+        document.addEventListener("keyup", addTaskByEnterkey);
         checkIconCont.addEventListener("click", this.checkIconEdits);
     }
     showTask() {
@@ -593,7 +606,7 @@ class TodoList {
             newListError.innerHTML = `${listTitleValue} already exixt`;
             newListError.style.padding = ".5rem";
         } else {
-            newListError.innerHTML = "Please enter a list name";
+            newListError.innerHTML = "Please enter a list title";
             newListError.style.padding = ".5rem";
         }
     }
@@ -607,11 +620,6 @@ class TodoList {
         return currentTaskArray;
     }
     displayNewList() {
-        document.addEventListener("keyup", (e) => {
-            if (e.key === "Enter") {
-                this.addNewList();
-            }
-        });
         addTodoListBtn.addEventListener("click", () => {
             this.addNewList();
         });
@@ -624,6 +632,7 @@ class TodoList {
                 this.list.getStorageList();
                 this.list.openTodoDialog();
                 newListBtn.removeEventListener("click", getTaskPageContent);
+                document.removeEventListener("keyup", addTaskByEnterkey);
                 newListBtnText.innerHTML = "New List";
                 toggleIcons("flex", "none");
             }
