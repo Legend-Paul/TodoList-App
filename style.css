@@ -314,23 +314,27 @@ dialog {
 
 @media screen and (width <= 1000px) {
     main,
-    .task-header,
-    .description-cont input {
+    .task-header {
         width: 90% !important;
         margin: auto;
         .list {
             margin-left: 2.5rem !important;
         }
     }
+    .description-cont input {
+        margin-right: 5%;
+    }
 }
 @media screen and (width <= 600px) {
     main,
-    .task-header,
-    .description-cont input {
+    .task-header {
         width: 95% !important;
         margin: auto;
         .list {
             margin-left: 1rem !important;
         }
+    }
+    .description-cont input {
+        margin-right: 2.5%;
     }
 }
