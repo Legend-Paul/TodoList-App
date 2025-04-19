@@ -322,7 +322,7 @@ dialog {
         }
     }
     .description-cont input {
-        margin-right: 5%;
+        margin-right: 5% !important;
     }
 }
 @media screen and (width <= 600px) {
@@ -335,6 +335,6 @@ dialog {
         }
     }
     .description-cont input {
-        margin-right: 2.5%;
+        margin-right: 2.5% !important;
     }
 }
