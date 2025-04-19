@@ -26,6 +26,10 @@ let addListByEnterKey = (e) => {
 function editListTitleName() {
     let newListName = editListTitle.value;
     if (newListName) {
+        newListBtn.removeEventListener("click", getTaskPageContent);
+        newListBtn.addEventListener("click", openDialog);
+        newListBtnText.innerHTML = "New List";
+        toggleIcons("flex", "none");
         todoList.editListArray(newListName);
         todoList.editTaskContentObj(newListName);
     }
@@ -99,8 +103,10 @@ function getTaskPageContent() {
     `;
     listCont.innerHTML = taskPageContent;
     toggleIcons("none", "inline-block");
-    document.addEventListener("keyup", addTaskByEnterkey);
+    checkIconCont.removeEventListener("click", todoList.task.checkIconEdits);
     document.removeEventListener("keyup", editTaskByEnterKey);
+    checkIconCont.addEventListener("click", todoList.task.checkIconContEvent);
+    document.addEventListener("keyup", addTaskByEnterkey);
 }
 
 function toggleIcons(newListBtnState, checkIconState) {
@@ -392,12 +398,10 @@ class Task {
         let checkBoxes = document.querySelectorAll(".checkbox");
         if (checkBoxes) {
             checkBoxes.forEach((checkBox, i) => {
-                console.log(checkBox.checked);
                 checkBox.addEventListener("click", () => {
                     let taskCont = document.querySelectorAll(".task")[i];
                     let comletedTaskHeadline =
                         document.querySelectorAll(".task-headline")[i];
-                    console.log(comletedTaskHeadline);
                     comletedTaskHeadline.classList.toggle(
                         "task-comlete-headline"
                     );
@@ -461,6 +465,7 @@ class Task {
     }
 
     rederTask() {
+        checkIconCont.removeEventListener("click", this.checkIconEdits);
         checkIconCont.addEventListener("click", this.checkIconContEvent);
     }
 
@@ -651,9 +656,9 @@ class TodoList {
                 this.list.getStorageList();
                 this.list.openTodoDialog();
                 newListBtn.removeEventListener("click", getTaskPageContent);
-                document.removeEventListener("keyup", addTaskByEnterkey);
                 newListBtnText.innerHTML = "New List";
                 toggleIcons("flex", "none");
+                document.removeEventListener("keyup", addTaskByEnterkey);
             }
         });
     }
