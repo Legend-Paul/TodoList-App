@@ -314,7 +314,8 @@ dialog {
 
 @media screen and (width <= 1000px) {
     main,
-    .task-header {
+    .task-header,
+    .description-cont input {
         width: 90% !important;
         margin: auto;
         .list {
@@ -324,7 +325,8 @@ dialog {
 }
 @media screen and (width <= 600px) {
     main,
-    .task-header {
+    .task-header,
+    .description-cont input {
         width: 95% !important;
         margin: auto;
         .list {
