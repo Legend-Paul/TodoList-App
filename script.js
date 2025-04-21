@@ -91,9 +91,9 @@ function getTaskPageContent() {
                 <input type="time" class="time">
             </label>
             <div class="repeate-options-cont">
-                <p>Select Repeate Options</p>
+                <p>Select Priority Options</p>
                 <select name="repeate-options" class="repeate-options">
-                    <option value="Once">No Repeate</option>
+                    <option value="Once">Once</option>
                     <option value="Everyday">Everyday</option>
                     <option value="Per week">Per Week</option>
                     <option value="Per month">Per Month</option>
