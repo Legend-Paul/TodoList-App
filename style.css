@@ -322,7 +322,7 @@ dialog {
         }
     }
     .description-cont input {
-        width: 95% !important;
+        width: 90% !important;
     }
 }
 @media screen and (width <= 600px) {
@@ -335,6 +335,6 @@ dialog {
         }
     }
     .description-cont input {
-        width: 97.5% !important;
+        width: 95% !important;
     }
 }
